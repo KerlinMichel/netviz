@@ -14,8 +14,6 @@ public class SphereGenerator : MonoBehaviour {
     ArrayList sizes;
     ArrayList spheres;
 	void Start () {
-        //GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-        //sphere.transform.position = new Vector3(0, 1.5F, 0);
         string text = System.IO.File.ReadAllText("Z:\\Desktop\\netflow\\net-data.csv");
         string[] lines = text.Split('\n');
         data = new string[lines.Length][];
@@ -44,21 +42,21 @@ public class SphereGenerator : MonoBehaviour {
                 //print(data[sim_iter][8]);
                 if (!users.Contains(data[sim_iter][0]))
                 {
-                    print("new user");
                     users.Add(data[sim_iter][0]);
                     sizes.Add(int.Parse(data[sim_iter][6]));
                     GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
                     spheres.Add(sphere);
-                    sphere.transform.position = new Vector3((1.5f * users.Count) - 40, 1.5F, 0);
+                    sphere.transform.position = new Vector3((2f * users.Count) - 40, 1.5F, 0);
                     int size = int.Parse(data[sim_iter][6]);
-                    sphere.transform.localScale = new Vector3((float)Math.Log(1.5, size * 100 / 203683), (float)Math.Log(1.5, size * 100 / 203683), (float)Math.Log(1.5, size * 100 / 203683));
+                    float scale = Math.Min(size / 4000, 1) * 1.5f + 0.5f;
+                    sphere.transform.localScale = new Vector3(scale, scale, scale);
                 } else
                 {
-                    print("found in list");
                     int idx = users.IndexOf(data[sim_iter][0]);
                     sizes[idx] = (int)sizes[idx] + int.Parse(data[sim_iter][6]);
                     int size = (int)sizes[idx];
-                    ((GameObject)spheres[idx]).transform.localScale = new Vector3((float)Math.Log(1.5, size*100/203683), (float)Math.Log(1.5, size*100/203683), (float)Math.Log(1.5, size*100/203683));
+                    float scale = Math.Min(size / 4000, 1) * 1.5f + 0.5f;
+                    ((GameObject)spheres[idx]).transform.localScale = new Vector3(scale, scale, scale);
                 }
                 sim_iter++;
             }
