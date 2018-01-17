@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class SphereGenerator : MonoBehaviour {
+
+    //Main server sphere position
+    Vector3 pVec = new Vector3(0,0,0);
 
     // Use this for initialization
     string[][] data;
@@ -14,7 +17,7 @@ public class SphereGenerator : MonoBehaviour {
     ArrayList sizes;
     ArrayList spheres;
 	void Start () {
-        string text = System.IO.File.ReadAllText("Z:\\Desktop\\netflow\\net-data.csv");
+        string text = System.IO.File.ReadAllText("U:\\Desktop\\netflow\\net-data.csv");
         string[] lines = text.Split('\n');
         data = new string[lines.Length][];
         for(int i = 0; i < lines.Length; i++)
@@ -29,6 +32,10 @@ public class SphereGenerator : MonoBehaviour {
         users = new ArrayList();
         sizes = new ArrayList();
         spheres = new ArrayList();
+
+        GameObject mainServerSphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        mainServerSphere.transform.position = pVec;
+        mainServerSphere.transform.localScale = new Vector3(10, 10, 10);
     }
 	
 	// Update is called once per frame
@@ -46,7 +53,14 @@ public class SphereGenerator : MonoBehaviour {
                     sizes.Add(int.Parse(data[sim_iter][6]));
                     GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
                     spheres.Add(sphere);
-                    sphere.transform.position = new Vector3((2f * users.Count) - 40, 1.5F, 0);
+                    float r = 10;
+                    float theta = Random.Range(0, (float)Math.PI);
+                    float phi = Random.Range(0, (float)(2*Math.PI));
+                    float x = (float)(r * Math.Sin(theta) * Math.Cos(phi));
+                    float y = (float)(r * Math.Cos(theta));
+                    float z = (float)(r * Math.Sin(theta) * Math.Sin(phi));
+                    sphere.transform.position = new Vector3(x, y, z);
+                    //sphere.transform.position = new Vector3((2f * users.Count) - 40, 1.5F, 0);
                     int size = int.Parse(data[sim_iter][6]);
                     float scale = Math.Min(size / 4000, 1) * 1.5f + 0.5f;
                     sphere.transform.localScale = new Vector3(scale, scale, scale);
@@ -67,5 +81,6 @@ public class SphereGenerator : MonoBehaviour {
         {
 
         }*/
+        
     }
 }
