@@ -8,7 +8,6 @@ public class SphereGenerator : MonoBehaviour {
     //Main server sphere position
     Vector3 pVec = new Vector3(0,0,0);
 
-    // Use this for initialization
     string[][] data;
     DateTime realtime_start;
     DateTime sim_start;
@@ -17,6 +16,7 @@ public class SphereGenerator : MonoBehaviour {
     ArrayList sizes;
     ArrayList spheres;
 	void Start () {
+        //read csv file to get data
         string text = System.IO.File.ReadAllText("U:\\Desktop\\netflow\\net-data.csv");
         string[] lines = text.Split('\n');
         data = new string[lines.Length][];
@@ -32,7 +32,7 @@ public class SphereGenerator : MonoBehaviour {
         users = new ArrayList();
         sizes = new ArrayList();
         spheres = new ArrayList();
-
+        //mainServerSphere represents the FIU network being used by users
         GameObject mainServerSphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
         mainServerSphere.transform.position = pVec;
         mainServerSphere.transform.localScale = new Vector3(10, 10, 10);
@@ -42,17 +42,20 @@ public class SphereGenerator : MonoBehaviour {
 	void Update () {
         while(true)
         {
+            //reached end of data
             if (sim_iter+1 > data.Length-1)
                 break;
+            //simulate network data by checking the passage of time
             if ((DateTime.Now - realtime_start) > (DateTime.Parse(data[sim_iter][8]) - sim_start))
             {
-                //print(data[sim_iter][8]);
                 if (!users.Contains(data[sim_iter][0]))
                 {
                     users.Add(data[sim_iter][0]);
                     sizes.Add(int.Parse(data[sim_iter][6]));
                     GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
                     spheres.Add(sphere);
+                    //the position is determined randomly by spherical coordinates http://mathworld.wolfram.com/SphericalCoordinates.html
+                    //the x,y,z equations do match up as the link above since the conventional mathematical coordinate system is different from the unity coordinate system
                     float r = 10;
                     float theta = Random.Range(0, (float)Math.PI);
                     float phi = Random.Range(0, (float)(2*Math.PI));
@@ -60,12 +63,13 @@ public class SphereGenerator : MonoBehaviour {
                     float y = (float)(r * Math.Cos(theta));
                     float z = (float)(r * Math.Sin(theta) * Math.Sin(phi));
                     sphere.transform.position = new Vector3(x, y, z);
-                    //sphere.transform.position = new Vector3((2f * users.Count) - 40, 1.5F, 0);
                     int size = int.Parse(data[sim_iter][6]);
+                    //size of sphere is determine by the size of the packets the user has sent
                     float scale = Math.Min(size / 4000, 1) * 1.5f + 0.5f;
                     sphere.transform.localScale = new Vector3(scale, scale, scale);
                 } else
                 {
+                    //update the size of the sphere by the size of the packets
                     int idx = users.IndexOf(data[sim_iter][0]);
                     sizes[idx] = (int)sizes[idx] + int.Parse(data[sim_iter][6]);
                     int size = (int)sizes[idx];
@@ -77,10 +81,6 @@ public class SphereGenerator : MonoBehaviour {
             else
                 break;
         }
-        /*for(int i = 0; i < users.Count; i++)
-        {
-
-        }*/
         
     }
 }
